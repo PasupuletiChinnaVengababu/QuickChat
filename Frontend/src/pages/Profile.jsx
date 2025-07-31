@@ -1,15 +1,29 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import assets from "../assets/assets";
+import { authContextProvider } from "../ccontext/AuthContext";
 
 const Profile=()=>{
+
+    const {authuser,updateprofile}=useContext(authContextProvider)
     const[selectimage,setSelectImage]=useState(null)
-    const [name,setName]=useState("Martin Johnson")
+    const [name,setName]=useState(authuser.fullname)
     const navigate=useNavigate();
-    const [bio,setBio]=useState("Hi Everyone, I am using Quickchat");
+    const [bio,setBio]=useState(authuser.bio);
     const handlesumitted= async(e)=>{
         e.preventDefault();
-        navigate("/")
+        if(!selectimage){
+            await updateprofile({fullname:name,bio})
+            navigate("/");
+            return;
+        }
+        const reader = new FileReader();
+        reader.readAsDataURL(selectimage);
+        reader.onload=async ()=>{
+            const base64Image=reader.result;
+            await updateprofile({profilePic:base64Image,fullname:name,bio})
+            navigate("/")
+        }
     }
     return(
         
@@ -27,7 +41,7 @@ const Profile=()=>{
                 <textarea   value={bio} onChange={(e)=>setBio(e.target.value)} className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-violet-500" rows={4}placeholder="Write profile bio"></textarea>
                 <button className="bg-gradient-to-r from-purple-400 to-violet-600 text-white p-2 rounded-full text-lg cursor-pointer" type="submit">Save</button>
             </form>
-            <img src={assets.logo_icon} className="max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10" alt=""/>
+            <img src={authuser.profilePic||assets.logo_icon} className="max-w-44 aspect-square rounded-full mx-10 max-sm:mt-10" alt=""/>
         </div>
         </div>
         </>

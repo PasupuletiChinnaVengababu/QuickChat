@@ -28,7 +28,7 @@ export const Signup = async (req, res) => {
       bio,
     });
     const token = generateToken(newUser._id);
-    res.json({ newUser, token, message: "Succesfull created account" });
+    res.json({ success:true,user:newUser, token, message: "Succesfull created account" });
     console.log("hello")
   } 
   catch (error) {
@@ -43,16 +43,16 @@ export const Login = async (req, res) => {
     const user = await userModel.findOne({ email });
     const ispassword = await bcrypt.compare(password, user.password);
     if (!ispassword) {
-      res.jon({ Message: "success" });
+      res.jon({ success:false,Message: "success" });
     }
     const token = generateToken(user._id);
-    res.json({ user, token, message: "Succesfull created account" });
+    res.json({success:true, user, token, message: "Succesfull login into the account" });
   } catch (error) {
     res.json({ message: "Having some issuses while loging into the account" });
   }
 };
 export const checkAuth = (req, res) => {
-  res.json({ sucess: true, user: req.user });
+  res.json({ success: true, user: req.user });
 };
 
 export const updateProfile = async (req, res) => {
@@ -64,7 +64,8 @@ export const updateProfile = async (req, res) => {
         bio,
         password,
       });
-    return res.json({updateUser})
+    
+    return res.json({success:true,updateUser})
     }
     const upload = await cloudinary.uploader.upload(profilePic);
     const updateUser = await userModel.findByIdAndUpdate(req.user._id, {
@@ -72,6 +73,7 @@ export const updateProfile = async (req, res) => {
       password,
       profilePic: upload.secure_url,
     });
+    res.json({success:true,updateUser})
     
   } 
   catch(error) {

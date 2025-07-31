@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useContext, useState } from "react";
 import assets from "../assets/assets";
+import { authContextProvider } from "../ccontext/AuthContext";
 
 const Login = () => {
   const [current, setCurrent] = useState("Sign up");
@@ -8,12 +9,14 @@ const Login = () => {
   const [password, setPassword] = useState("");
   const [bio, setBio] = useState("");
   const [isDataSubmitted, setIsDataSubmitted] = useState(false);
+  const {login}=useContext(authContextProvider)
   const handleSubmit=(e)=>{
     e.preventDefault();
     if(current=="Sign up" && !isDataSubmitted){
         setIsDataSubmitted(true);
         return;
     }
+    login(current==="Sign up"?'Signup':'Login',{fullname,email,password,bio})
   }
   return (
     <div className="min-h-screen bg-cover bg-center flex items-center justify-center gap-8 sm:justify-evenly max-sm:flex-col backdrop-blur-2xl">
@@ -56,7 +59,7 @@ const Login = () => {
         {
             current=="Sign up" && isDataSubmitted &&(
                 <>
-                <textarea value={bio} onChange={(e)=>setBio(e.target.ariaValueText)} rows={4} className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter bio"></textarea>
+                <textarea value={bio} onChange={(e)=>setBio(e.target.value)} rows={4} className="p-2 border border-gray-500 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500" placeholder="Enter bio"></textarea>
                 </>
             )
         }
